@@ -1,36 +1,28 @@
-// import Image from "next/image";
 "use client";
-import { Avatar, Grid } from "@mui/material";
+import Image from "next/image";
+import { Avatar, Divider, Grid } from "@mui/material";
 import SimpleDialog from "./modal";
 import styles from "../page.module.css";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useState } from "react";
+import Logo from "../../../assets/Ultra_Ball_icon.png";
+import PersonIcon from "@mui/icons-material/Person";
+import AccountMenu from "./menuAccount";
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
-
-  function openModal() {
-    setOpen(!open);
-  }
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   return (
-    <Grid className={styles.header}>
-      <p>HEADER</p>
-      <p>Log In</p>
-      <p>Log Out</p>
-      <Grid onClick={openModal} sx={{ cursor: "pointer" }}>
-        <Avatar src="/broken-image.jpg" />
+    <header className={styles.header}>
+      <Grid className={styles.logo_container}>
+        <Image src={Logo} width={50} height={50} alt="Logo" />
+        <p>Boutique Pokémons</p>
       </Grid>
-      <SimpleDialog
-        // selectedValue={selectedValue}
-        open={open}
-        onClose={handleClose}
-      />
-      <ShoppingCartOutlinedIcon />
-    </Grid>
+      <Grid className={styles.header_icons_container}>
+        <Grid sx={{ cursor: "pointer" }}>
+          <AccountMenu />
+        </Grid>
+        <Divider orientation="vertical" flexItem />
+        <ShoppingCartOutlinedIcon fontSize="large" />
+      </Grid>
+    </header>
   );
 }

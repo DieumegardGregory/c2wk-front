@@ -17,9 +17,7 @@ export default function Sidebar() {
   return (
     <Grid className={styles.sidebar}>
       <Grid>
-        <Link onClick={openModal} sx={{ cursor: "pointer" }}>
-          Ajouter un produit
-        </Link>
+        <p>Affiner par catégories</p>
       </Grid>
       <SimpleDialog
         children={
