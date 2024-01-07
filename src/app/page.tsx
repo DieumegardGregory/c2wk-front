@@ -23,7 +23,7 @@ export default function Home() {
   const { products } = listeProduits;
 
   return (
-    <Grid className={styles.homepage}>
+    <main className={(styles.main, styles.homepage)}>
       <Sidebar />
       <section className={styles.home_group_sections}>
         <section className={styles.section_products}>
@@ -54,6 +54,6 @@ export default function Home() {
           />
         </Grid>
       </section>
-    </Grid>
+    </main>
   );
 }

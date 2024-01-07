@@ -15,23 +15,10 @@ export default function Sidebar() {
     setOpen(false);
   };
   return (
-    <Grid className={styles.sidebar}>
+    <aside className={styles.sidebar}>
       <Grid>
         <p>Affiner par catégories</p>
       </Grid>
-      <SimpleDialog
-        children={
-          <FormGroup>
-            <TextField
-              id="outlined-basic"
-              label="Outlined"
-              variant="outlined"
-            />
-          </FormGroup>
-        }
-        open={open}
-        onClose={handleClose}
-      />
-    </Grid>
+    </aside>
   );
 }

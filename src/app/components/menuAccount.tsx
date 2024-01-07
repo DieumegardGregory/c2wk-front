@@ -11,6 +11,7 @@ import PersonAdd from "@mui/icons-material/PersonAdd";
 import Settings from "@mui/icons-material/Settings";
 import Logout from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
+import Link from "next/link";
 
 export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -80,7 +81,9 @@ export default function AccountMenu() {
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
-          Se déconnecter
+          <p>
+            <Link href="./connexion">Se connecter</Link>
+          </p>
         </MenuItem>
       </Menu>
     </React.Fragment>
