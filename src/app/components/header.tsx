@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <Grid>
-        <Link href="./" className={styles.logo_container}>
+        <Link href="/" className={styles.logo_container}>
           <Image src={Logo} width={50} height={50} alt="Logo" />
           <p>Boutique Pokémons</p>
         </Link>

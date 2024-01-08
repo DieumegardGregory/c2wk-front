@@ -7,8 +7,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SimpleDialog from "./components/modal";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import listeProduits from "./mock/data-mock.json";
-import { getProducts } from "./services/api-services";
+import listeproducts from "./mock/data-mock.json";
+import * as apiProductService from "./services/api-products-service";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
@@ -16,7 +16,7 @@ export default function Home() {
 
   useEffect(() => {
     async function getData() {
-      setProducts(await getProducts());
+      setProducts(await apiProductService.getProducts());
     }
     getData();
   }, []);
@@ -29,7 +29,7 @@ export default function Home() {
     setOpen(false);
   };
   // TODO: sortir dans les interfaces
-  interface Produit {
+  interface Product {
     id_product: number;
     name_product: string;
     price: number;
@@ -42,14 +42,17 @@ export default function Home() {
       <Sidebar />
       <section className={styles.home_group_sections}>
         <section className={styles.section_products}>
-          <h1 className={styles.title}>Nos produits</h1>
+          <h1 className={styles.title}>Nos products</h1>
           <Grid className={styles.list_products}>
-            {products.map(function (produit: Produit) {
+            {products.map(function (product: Product) {
               return (
-                <Link href="/product" key={produit.id_product}>
+                <Link
+                  href={`/products/${product.id_product}`}
+                  key={product.id_product}
+                >
                   <CardProduct
-                    titre={produit.name_product}
-                    prix={`${produit.price} €`}
+                    titre={product.name_product}
+                    prix={`${product.price} €`}
                   ></CardProduct>
                 </Link>
               );
