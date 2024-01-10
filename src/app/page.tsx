@@ -1,18 +1,24 @@
 "use client";
 import styles from "./page.module.css";
 import CardProduct from "./components/product";
-import { Divider, Grid } from "@mui/material";
-import Sidebar from "./components/sidebar";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import SimpleDialog from "./components/modal";
+import {
+  Checkbox,
+  Divider,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import listeproducts from "./mock/data-mock.json";
 import * as apiProductService from "./services/api-products-service";
+import * as apiCategoryService from "./services/api-categories-service";
+import { Product } from "./interfaces/product-interface";
+import { Category } from "./interfaces/category-interface";
 
 export default function Home() {
   const [open, setOpen] = useState(false);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     async function getData() {
@@ -21,30 +27,55 @@ export default function Home() {
     getData();
   }, []);
 
-  function openModal() {
+  useEffect(() => {
+    async function getData() {
+      setCategories(await apiCategoryService.getCategories());
+    }
+    getData();
+  }, []);
+
+  const openModal = () => {
     setOpen(!open);
-  }
+  };
 
   const handleClose = () => {
     setOpen(false);
   };
-  // TODO: sortir dans les interfaces
-  interface Product {
-    id_product: number;
-    name_product: string;
-    price: number;
-    picture: string;
-    description: string;
-  }
 
   return (
     <main className={(styles.main, styles.homepage)}>
-      <Sidebar />
+      <aside className={styles.sidebar}>
+        <Grid
+          container
+          flexDirection="column"
+          minWidth="max-content"
+          marginRight="16px"
+        >
+          <h2 className={styles.sidebar_title}>Affiner par catégories</h2>
+          <FormGroup>
+            {categories.map((category: Category) => {
+              return (
+                <FormControlLabel
+                  key={category.id_category}
+                  control={<Checkbox />}
+                  label={category.name_category}
+                />
+              );
+            })}
+          </FormGroup>
+        </Grid>
+        <Divider
+          variant="middle"
+          orientation="vertical"
+          sx={{ height: "100vh" }}
+        />
+      </aside>
+
       <section className={styles.home_group_sections}>
         <section className={styles.section_products}>
-          <h1 className={styles.title}>Nos products</h1>
+          <h1 className={styles.title}>Our products</h1>
           <Grid className={styles.list_products}>
-            {products.map(function (product: Product) {
+            {products.map((product: Product) => {
               return (
                 <Link
                   href={`/products/${product.id_product}`}
@@ -59,7 +90,7 @@ export default function Home() {
             })}
           </Grid>
         </section>
-        <Divider variant="middle" />
+        {/* <Divider variant="middle" />
         <Grid className={styles.addproduct_container}>
           <AddCircleOutlineIcon
             onClick={openModal}
@@ -70,7 +101,7 @@ export default function Home() {
             open={open}
             onClose={handleClose}
           />
-        </Grid>
+        </Grid> */}
       </section>
     </main>
   );
