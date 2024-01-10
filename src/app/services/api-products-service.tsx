@@ -1,6 +1,6 @@
 import { ProductInterface } from "../interfaces/product-interface";
 
-const baseURL = "http://20.121.217.47:5001";
+const baseURL = "http://172.172.145.21:5001";
 
 // Products
 
