@@ -5,11 +5,11 @@ import styles from "../page.module.css";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import Logo from "../../../assets/Ultra_Ball_icon.png";
 import AccountMenu from "./menuAccount";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Header() {
   const router = useRouter();
-
+  const pathname = usePathname();
   return (
     <header className={styles.header}>
       <Grid>
@@ -22,10 +22,14 @@ export default function Header() {
         <Grid sx={{ cursor: "pointer" }}>
           <AccountMenu />
         </Grid>
-        <Divider orientation="vertical" flexItem />
-        <Button type="button" onClick={() => router.push("/panier")}>
-          <ShoppingCartOutlinedIcon fontSize="large" />
-        </Button>
+        {(pathname.includes('admin') || pathname.includes('connexion')) ? null : 
+          <>
+            <Divider orientation="vertical" flexItem />
+            <Button type="button" onClick={() => router.push("/panier")}>
+              <ShoppingCartOutlinedIcon fontSize="large" />
+            </Button>
+          </>
+        }
       </Grid>
     </header>
   );
