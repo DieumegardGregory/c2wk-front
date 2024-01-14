@@ -1,27 +1,139 @@
 "use client";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { colors } from "@/app/utils/colors";
 import styles from "../../page.module.css";
-import { Button, Grid, TextField, Box, Icon, Typography } from "@mui/material";
+import { Category } from "@/app/interfaces/interfaces";
+import { Button, Grid, TextField, Box, Icon, Typography, Badge } from "@mui/material";
 import { AddCircleOutline, UpdateOutlined, DeleteOutline } from "@mui/icons-material";
 import CategoryForm from "../components/CategoryForm";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+const token = localStorage.getItem('token');
+
 export default function CategoriesPage() {
-    const [category, setCategory] = useState<string>('');
-    const [openedForm, setOpenedForm] = useState<number>(0);
+    const [activeTab, setActiveTab] = useState<number>(0);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [selectedCategoriesIDs, setSelectedCategoriesIDs] = useState<number[]>([]);
+
+    const getCategories = async () => {
+        const response = await fetch(`${apiUrl}/api/categories`)
+        .then((response) => response.json())
+        .then((data) => data)
+        setCategories(response);
+    }
+
+    useEffect(() => {
+        getCategories();
+        return () => {
+            setActiveTab(0);
+        }
+    }, [])
+
+    const addCategory = async (nameCategory: string) => {
+        const newCategory = {
+            nameCategory: nameCategory,
+        }
+        await fetch(`${apiUrl}/api/categories`, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+                "Access-Control-Allow-Origin": `${process.env.NEXT_PUBLIC_CLIENT_URL}`,
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(newCategory),
+        })
+        .then((response) => response.json())
+        .then((data: Category) => {
+            if (data) {
+                setCategories([ ...categories, data ]); 
+            }
+        })
+        setActiveTab(0);
+    }
 
     const handleChipClick = (n: number) => {
-      setOpenedForm(n);
+      setActiveTab(n);
+    }
+
+    function defineBadgeColor(categoryName: string) {
+        const arrayFound = colors.find((element) => element[0] === categoryName);
+        if (arrayFound) {
+            return arrayFound[1];
+        } else {
+            return 'white';
+        }
+    }
+
+    const handleCategorySelection = (id: number) => {
+        if (activeTab === 2) {
+            setSelectedCategoriesIDs([id]);
+        } else {
+            if (!selectedCategoriesIDs.includes(id)) {
+                setSelectedCategoriesIDs([...selectedCategoriesIDs, id])
+            } else {
+                const idFoundIndex = selectedCategoriesIDs.findIndex((element) => element === id );
+                selectedCategoriesIDs.splice(idFoundIndex, 1);
+                setSelectedCategoriesIDs([...selectedCategoriesIDs]);
+            }
+        }  
+    }
+
+    const updateCategory = async (id: number, name: string) => {
+        const categoryToUpdate = {
+            nameCategory: name
+        }
+        const response = await fetch(`${apiUrl}/api/categories/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-type": "application/json",
+                "Access-Control-Allow-Origin": `${process.env.NEXT_PUBLIC_CLIENT_URL}`,
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(categoryToUpdate),
+        })
+        .then((response) => response.json())
+        .then((data) => data);
+        const categoryIndex = categories.findIndex((element) => element.name_category === name);
+        categories.splice(categoryIndex, 1, response);
+        setCategories([...categories]);
+        setActiveTab(0);
+    }
+
+    const deleteCategory = async (id: number) => {
+        const response = await fetch(`${apiUrl}/api/categories/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-type": "application/json",
+                "Access-Control-Allow-Origin": `${process.env.NEXT_PUBLIC_CLIENT_URL}`,
+                "Authorization": "Bearer " + token
+            },
+        })
+        .then((response) => response.text())
+        .then((data) => data);
+        
+        if (response === '') {
+            const index = categories.findIndex((element) => element.id_category === id);
+            categories.splice(index, 1);
+            setCategories([...categories]);
+        }
+    }
+
+    const handleDelete = async (selection: number[]) => {
+        for (const id of selection) {
+            deleteCategory(id);
+        }
     }
 
     return (
-        <Box sx={{ height: '80%', width: '90%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '30px', m: 'auto'}}>
+        <Box sx={{ height: '80%', width: '90%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '30px', m: 'auto', p: '15px'}}>
             <h3 className="admin_h3">Manage your categories here</h3>
             <Typography>What&#39;s your mood today ?</Typography>
             <Box sx={{ height: '60px', width: '60%', display: 'grid', gridTemplateColumns: '30% 30% 30%', gap: '1%', m: "20px" }}>
                 <Button
                 variant="outlined"
-                className={styles.admin_chip}
+                className={activeTab === 1 ? styles.admin_chip_active : styles.admin_chip}
                 onClick={() => handleChipClick(1)}
                 >
                     <Icon fontSize="small" sx={{ height: '25px', width: '25px' }}>
@@ -31,7 +143,7 @@ export default function CategoriesPage() {
                 </Button>
                 <Button
                   variant="outlined"
-                  className={styles.admin_chip}
+                  className={activeTab === 2 ? styles.admin_chip_active : styles.admin_chip}
                   onClick={() => handleChipClick(2)}
                 >
                     <Icon fontSize="small" sx={{ height: '25px', width: '25px' }}>
@@ -41,7 +153,7 @@ export default function CategoriesPage() {
                 </Button>
                 <Button
                   variant="outlined"
-                  className={styles.admin_chip}
+                  className={activeTab === 3 ? styles.admin_chip_active : styles.admin_chip}
                   onClick={() => handleChipClick(3)}
                   >
                     <Icon fontSize="small" sx={{ height: '25px', width: '25px' }}>
@@ -50,7 +162,26 @@ export default function CategoriesPage() {
                     Delete
                 </Button>
             </Box>
-            {openedForm === 1 && <CategoryForm /> }
+            <Box sx={{ display: 'flex', height: '10%', width: '80%', m: 'auto', gap: '15px'}}>
+                <Typography>Your current categories :</Typography>
+                {categories && categories?.map((category: Category) => (
+                    <Button
+                        key={category.id_category}
+                        sx={{ height: '20px', width: '80px', backgroundColor: `${defineBadgeColor(category.name_category)}`, textAlign: 'center', borderRadius: '5px', transform: `${selectedCategoriesIDs.includes(category.id_category) ? "scale(1.2)" : "scale(1)"}` }}
+                        onClick={() => handleCategorySelection(category.id_category)}
+                    >
+                        {category.name_category}
+                    </Button>
+                ))}
+            </Box>
+            {(activeTab === 1 || activeTab === 2) && <CategoryForm activeTab={activeTab} addCategory={addCategory} updateCategory={updateCategory} selectedCategoriesIDs={selectedCategoriesIDs} /> }
+            {activeTab === 3 && 
+                <Button
+                    variant="contained"
+                    onClick={() => handleDelete(selectedCategoriesIDs)}
+                >
+                    Delete
+                </Button>}
         </Box>
     )
 }

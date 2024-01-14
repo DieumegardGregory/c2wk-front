@@ -49,7 +49,7 @@ const AuthProvider = ({ children }: any) => {
   const router = useRouter();
 
   const login = async (credentials: CredentialsInterface) => {
-    console.log(credentials);
+   
      await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: {

@@ -6,7 +6,10 @@ import { Button, Grid, TextField } from "@mui/material";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import Link from "next/link";
 import { UserInfosInterface } from "../interfaces/interfaces";
-import { register } from "../services/auth.services";
+import { useRouter } from "next/navigation";
+import { Http2ServerResponse } from "http2";
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function CreateAccountPage() {
   const [userInfos, setUserInfos] = useState<UserInfosInterface>({
@@ -15,6 +18,7 @@ export default function CreateAccountPage() {
     firstname: '',
     lastname: '',
   })
+  const router = useRouter();
 
   const handleChange = (e: any) => {
     const { value } = e.target;
@@ -23,6 +27,22 @@ export default function CreateAccountPage() {
       [e.target.name]: value,
     });
   };
+
+  const register = async (userInfos: UserInfosInterface) => {
+    const response = await fetch(`${apiUrl}/api/users`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(userInfos),
+    })
+    .then((response) => response)
+    .then((data) => data)
+    if (response.status === 201) {
+      router.replace('/connexion');
+    }   
+    
+  }
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -49,21 +69,21 @@ export default function CreateAccountPage() {
             id="lastname"
             label="Nom"
             variant="outlined"
-            name="firstname"
+            name="lastname"
             onChange={(e) => handleChange(e)}
           />
           <TextField
             id="mail"
             label="Email"
             variant="outlined"
-            name="firstname"
+            name="mail"
             onChange={(e) => handleChange(e)}
           />
           <TextField
             id="password"
             label="Mot de passe"
             variant="outlined"
-            name="firstname"
+            name="password"
             onChange={(e) => handleChange(e)}
           />
           <Button
