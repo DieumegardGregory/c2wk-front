@@ -8,7 +8,7 @@ import {
   FormGroup,
   Grid,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import * as apiProductService from "./services/api-products-service";
 import * as apiCategoryService from "./services/api-categories-service";
@@ -16,15 +16,20 @@ import { Product } from "./interfaces/product-interface";
 import { Category } from "./interfaces/category-interface";
 
 export default function Home() {
-  const [open, setOpen] = useState(false);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsSorted, setProductsSorted] = useState<Product[]>([]);
   const [categories, setCategories] = useState([]);
+  const [categorySelected, setCategorySelected] = useState<number[]>([]);
 
   useEffect(() => {
     async function getData() {
-      setProducts(await apiProductService.getProducts());
+      await apiProductService.getProducts().then((data) => {
+        setProducts(data);
+        setProductsSorted(data);
+      });
     }
     getData();
+    console.log(products);
   }, []);
 
   useEffect(() => {
@@ -34,12 +39,38 @@ export default function Home() {
     getData();
   }, []);
 
-  const openModal = () => {
-    setOpen(!open);
-  };
+  const sortProductByCategory = (id: number, isChecked: boolean) => {
+    if (isChecked) {
+      const categoriesSelected = categorySelected;
 
-  const handleClose = () => {
-    setOpen(false);
+      categoriesSelected.push(id);
+      setCategorySelected(categoriesSelected);
+    } else {
+      const categoriesSelected = categorySelected;
+
+      categoriesSelected.find((elem, index) => {
+        if (elem === id) {
+          categoriesSelected.splice(index, 1);
+        }
+      });
+
+      setCategorySelected(categoriesSelected);
+    }
+
+    if (categorySelected.length === 0) {
+      setProductsSorted(products);
+      return;
+    }
+
+    const productsSorted: Product[] = [];
+    categorySelected.forEach((cat) => {
+      products.forEach((prod: Product) => {
+        if (cat === prod.category_id) {
+          productsSorted.push(prod);
+        }
+      });
+    });
+    setProductsSorted(productsSorted);
   };
 
   return (
@@ -57,7 +88,16 @@ export default function Home() {
               return (
                 <FormControlLabel
                   key={category.id_category}
-                  control={<Checkbox />}
+                  control={
+                    <Checkbox
+                      onChange={(event) =>
+                        sortProductByCategory(
+                          category.id_category,
+                          event.target.checked
+                        )
+                      }
+                    />
+                  }
                   label={category.name_category}
                 />
               );
@@ -73,9 +113,9 @@ export default function Home() {
 
       <section className={styles.home_group_sections}>
         <section className={styles.section_products}>
-          <h1 className={styles.title}>Our products</h1>
+          <h1 className={styles.title}>Nos produits</h1>
           <Grid className={styles.list_products}>
-            {products.map((product: Product) => {
+            {productsSorted.map((product: Product) => {
               return (
                 <Link
                   href={`/products/${product.id_product}`}
@@ -90,18 +130,6 @@ export default function Home() {
             })}
           </Grid>
         </section>
-        {/* <Divider variant="middle" />
-        <Grid className={styles.addproduct_container}>
-          <AddCircleOutlineIcon
-            onClick={openModal}
-            sx={{ fontSize: "60px", color: "black", cursor: "pointer" }}
-          />
-          <SimpleDialog
-            // selectedValue={selectedValue}
-            open={open}
-            onClose={handleClose}
-          />
-        </Grid> */}
       </section>
     </main>
   );
