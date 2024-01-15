@@ -1,12 +1,12 @@
 "use client";
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { colors } from "@/app/utils/colors";
 import styles from "../../page.module.css";
 import { Category } from "@/app/interfaces/interfaces";
 import { Button, Grid, TextField, Box, Icon, Typography, Badge } from "@mui/material";
 import { AddCircleOutline, UpdateOutlined, DeleteOutline } from "@mui/icons-material";
 import CategoryForm from "../components/CategoryForm";
+import { AuthContext } from "@/app/context/Authcontext";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -16,6 +16,7 @@ export default function CategoriesPage() {
     const [activeTab, setActiveTab] = useState<number>(0);
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategoriesIDs, setSelectedCategoriesIDs] = useState<number[]>([]);
+    const { user } = useContext(AuthContext);
 
     const getCategories = async () => {
         const response = await fetch(`${apiUrl}/api/categories`)
@@ -62,7 +63,7 @@ export default function CategoriesPage() {
         if (arrayFound) {
             return arrayFound[1];
         } else {
-            return 'white';
+            return '#e4e4e4';
         }
     }
 
@@ -167,7 +168,7 @@ export default function CategoriesPage() {
                 {categories && categories?.map((category: Category) => (
                     <Button
                         key={category.id_category}
-                        sx={{ height: '20px', width: '80px', backgroundColor: `${defineBadgeColor(category.name_category)}`, textAlign: 'center', borderRadius: '5px', transform: `${selectedCategoriesIDs.includes(category.id_category) ? "scale(1.2)" : "scale(1)"}` }}
+                        sx={{ height: '30px', width: '100px', backgroundColor: `${defineBadgeColor(category.name_category)}`, color: '#000', textAlign: 'center', borderRadius: '5px', transform: `${selectedCategoriesIDs.includes(category.id_category) ? "scale(1.2)" : "scale(1)"}`, m: '0 5px' }}
                         onClick={() => handleCategorySelection(category.id_category)}
                     >
                         {category.name_category}

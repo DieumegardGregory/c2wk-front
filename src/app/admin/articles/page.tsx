@@ -6,10 +6,10 @@ import { Button, Grid, TextField, Typography, Box, Icon } from "@mui/material";
 import { AddCircleOutline, UpdateOutlined, DeleteOutline } from "@mui/icons-material";
 
 export default function ArticlesPage() {
-    const [openedForm, setOpenedForm] = useState<number>(0);
+    const [activeTab, setActiveTab] = useState<number>(0);
 
     const handleChipClick = (n: number) => {
-      setOpenedForm(n);
+      setActiveTab(n);
     }
     return (
         <Box sx={{ height: '80%', width: '90%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '30px', m: 'auto'}}>

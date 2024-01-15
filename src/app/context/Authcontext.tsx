@@ -3,6 +3,7 @@ import React, { useReducer, createContext, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { CredentialsInterface, User, UserIDs } from '../interfaces/interfaces';
 import { useRouter, usePathname } from 'next/navigation';
+import { getOneUser } from '../services/auth.services';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -45,8 +46,9 @@ const AuthProvider = ({ children }: any) => {
     id: 0,
     mail: '',
   });
+  const [isAdmin, setIsAdmin] = React.useState<boolean>(false);
   const router = useRouter();
-  const pathName = usePathname();
+  const pathname = usePathname();
 
   const login = async (credentials: CredentialsInterface) => {
    
@@ -64,7 +66,8 @@ const AuthProvider = ({ children }: any) => {
 
         setUserIDs({ id: decoded.id, mail: decoded.mail })
       })
-    }     
+  }     
+
   const logout = () => {
     localStorage.removeItem('token');
     dispatch({ type: 'LOGOUT' });
@@ -75,13 +78,7 @@ const AuthProvider = ({ children }: any) => {
       router.push('/');
     }
     if (userIDs.id !== 0) {
-      const getOneUser = async (id: number) => {
-        const token = localStorage.getItem('token');
-        return await fetch(`${apiUrl}/api/users/${id}`, {
-          headers: {
-            'Authorization': 'Bearer ' + token
-          }
-        })
+      getOneUser(userIDs.id)
         .then((response) => response.json())
         .then((data: User) => {
           if (!data) {
@@ -97,17 +94,18 @@ const AuthProvider = ({ children }: any) => {
              redirectToHome();
            }
            if (data.role === 'admin') {
-             router.push('/admin');
+            setIsAdmin(true);
+            router.push('/admin');
            }
-           if (pathName.includes('admin') && data.role === 'user') {
-            redirectToHome();
-           }
-
         })
       }
-      getOneUser(userIDs.id);
+  }, [router, userIDs])
+
+  useEffect(() => {
+    if (!isAdmin && pathname.includes('admin')) {
+      router.replace('/');
     }
-  }, [userIDs, router, pathName])
+  }, [pathname, isAdmin, router]);
 
   return (
     <AuthContext.Provider value={{ user: state.user, login, logout }}>

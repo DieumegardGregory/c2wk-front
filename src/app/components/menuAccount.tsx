@@ -82,7 +82,7 @@ export default function AccountMenu() {
             <Logout fontSize="small" />
           </ListItemIcon>
           <p>
-            <Link href="./connexion">Se connecter</Link>
+            <Link href="/connexion">Se connecter</Link>
           </p>
         </MenuItem>
       </Menu>
