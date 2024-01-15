@@ -174,14 +174,18 @@ export default function CategoriesPage() {
                     </Button>
                 ))}
             </Box>
+            {activeTab === 2 && <Typography>Select the category you want to update and enter the new name</Typography>}
+            {activeTab === 3 && <Typography>Select the categories you want to delete</Typography>}
             {(activeTab === 1 || activeTab === 2) && <CategoryForm activeTab={activeTab} addCategory={addCategory} updateCategory={updateCategory} selectedCategoriesIDs={selectedCategoriesIDs} /> }
             {activeTab === 3 && 
                 <Button
                     variant="contained"
                     onClick={() => handleDelete(selectedCategoriesIDs)}
+                    disabled={selectedCategoriesIDs.length === 0}
                 >
                     Delete
-                </Button>}
+                </Button>
+            }
         </Box>
     )
 }

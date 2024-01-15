@@ -40,8 +40,9 @@ export default function CategoryForm({ addCategory, activeTab, updateCategory, s
           <Button
             variant="contained"
             onClick={(e) => handleSubmit(e)}
+            disabled={selectedCategoriesIDs.length === 0}
           >
-            Add
+            {activeTab === 1 ? 'Add' : 'Update'}  
           </Button>
         </Box>
     )
