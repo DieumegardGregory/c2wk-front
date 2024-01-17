@@ -1,4 +1,7 @@
-import { ProductInterface } from "../interfaces/product-interface";
+import {
+  ProductInterface,
+  ProductPostPayload,
+} from "../interfaces/product-interface";
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,11 +29,16 @@ export const getProduct = async (id: number) => {
     });
 };
 
-export const postProduct = async (product: ProductInterface) => {
+export const postProduct = async (
+  product: ProductPostPayload,
+  token: string
+) => {
   return await fetch(`${baseURL}/api/products`, {
     method: "POST",
     headers: {
+      Accept: "application/json",
       "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
     },
     body: JSON.stringify(product),
   })
@@ -38,11 +46,16 @@ export const postProduct = async (product: ProductInterface) => {
     .then((data) => data);
 };
 
-export const updateProduct = async (id: number, product: ProductInterface) => {
+export const updateProduct = async (
+  id: number,
+  product: ProductPostPayload,
+  token: string
+) => {
   return await fetch(`${baseURL}/api/products/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
     },
     body: JSON.stringify(product),
   })
@@ -50,8 +63,12 @@ export const updateProduct = async (id: number, product: ProductInterface) => {
     .then((data) => data);
 };
 
-export const deleteProduct = async (id: number) => {
-  return await fetch(`${baseURL}/api/products/${id}`)
-    .then((response) => response.json())
-    .then((data) => data);
+export const deleteProduct = async (id: number, token: string) => {
+  return await fetch(`${baseURL}/api/products/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-type": "application/json",
+      Authorization: "Bearer " + token,
+    },
+  }).then(({ status }) => status);
 };
