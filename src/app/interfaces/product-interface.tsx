@@ -22,5 +22,5 @@ export interface ProductPostPayload {
   price: number | null;
   picture: string | null;
   description: string | null;
-  category: string | null;
+  category?: string | null;
 }

@@ -17,13 +17,13 @@ export default function ProductForm({
   updateProduct,
   selectedProductsIDs,
 }: ProductFormComponentProps) {
-  const [newProduct, setNewProduct] = useState<ProductPostPayload>({
-    nameProduct: null,
-    price: null,
-    picture: null,
-    description: null,
-    category: null,
-  });
+  // const [newProduct, setNewProduct] = useState<ProductPostPayload>({
+  //   nameProduct: null,
+  //   price: null,
+  //   picture: null,
+  //   description: null,
+  //   category: null,
+  // });
   const [productName, setProductName] = useState<string | null>(null);
   const [productPrice, setProductPrice] = useState<number | null>(null);
   const [productPicture, setProductPicture] = useState<string | null>(null);
@@ -45,6 +45,12 @@ export default function ProductForm({
       addProduct(newProduct);
     }
     if (activeTab === 2) {
+      const newProduct = {
+        nameProduct: productName,
+        price: productPrice,
+        picture: productPicture,
+        description: productDescription,
+      };
       updateProduct(selectedProductsIDs[0], newProduct);
     }
   };
@@ -98,18 +104,20 @@ export default function ProductForm({
         name="product-description"
         onChange={(e) => setProductDescription(e.target.value)}
       />
-      <TextField
-        sx={{ m: "20px" }}
-        id="product-category"
-        label="Category"
-        variant="outlined"
-        name="product-category"
-        onChange={(e) => setProductCategory(e.target.value)}
-      />
+      {activeTab === 1 && (
+        <TextField
+          sx={{ m: "20px" }}
+          id="product-category"
+          label="Category"
+          variant="outlined"
+          name="product-category"
+          onChange={(e) => setProductCategory(e.target.value)}
+        />
+      )}
       <Button
         variant="contained"
         onClick={(e) => handleSubmit(e)}
-        disabled={activeTab !== 1 && !checkFormValidity()}
+        // disabled={activeTab !== 1 && !checkFormValidity()}
       >
         {activeTab === 1 ? "Add" : "Update"}
       </Button>

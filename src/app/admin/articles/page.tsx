@@ -55,6 +55,27 @@ export default function ArticlesPage() {
     setActiveTab(0);
   };
 
+  const deleteProduct = async (productId: number) => {
+    token &&
+      apiProductService.deleteProduct(productId, token).then((status) => {
+        status === 204 &&
+          apiProductService.getProducts().then((data) => setProducts(data));
+      });
+  };
+
+  const updateProduct = async (
+    productId: number,
+    product: ProductPostPayload
+  ) => {
+    token &&
+      apiProductService
+        .updateProduct(productId, product, token)
+        .then((status) => {
+          status === 200 &&
+            apiProductService.getProducts().then((data) => setProducts(data));
+        });
+  };
+
   const handleChipClick = (n: number) => {
     setActiveTab(n);
   };
@@ -84,51 +105,9 @@ export default function ArticlesPage() {
     }
   };
 
-  //   const updateCategory = async (id: number, name: string) => {
-  //     const categoryToUpdate = {
-  //       nameCategory: name,
-  //     };
-  //     const response = await fetch(`${apiUrl}/api/categories/${id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-type": "application/json",
-  //         Authorization: "Bearer " + token,
-  //       },
-  //       body: JSON.stringify(categoryToUpdate),
-  //     })
-  //       .then((response) => response.json())
-  //       .then((data) => data);
-  //     const categoryIndex = categories.findIndex(
-  //       (element) => element.name_category === name
-  //     );
-  //     categories.splice(categoryIndex, 1, response);
-  //     setCategories([...categories]);
-  //     setActiveTab(0);
-  //   };
-
-  //   const deleteCategory = async (id: number) => {
-  //     const response = await fetch(`${apiUrl}/api/categories/${id}`, {
-  //       method: "DELETE",
-  //       headers: {
-  //         "Content-type": "application/json",
-  //         Authorization: "Bearer " + token,
-  //       },
-  //     })
-  //       .then((response) => response.text())
-  //       .then((data) => data);
-
-  //     if (response === "") {
-  //       const index = categories.findIndex(
-  //         (element) => element.id_category === id
-  //       );
-  //       categories.splice(index, 1);
-  //       setCategories([...categories]);
-  //     }
-  //   };
-
   const handleDelete = async (selection: number[]) => {
     for (const id of selection) {
-      //   deleteCategory(id);
+      deleteProduct(id);
     }
   };
 
@@ -241,7 +220,7 @@ export default function ArticlesPage() {
         <ProductForm
           activeTab={activeTab}
           addProduct={addProduct}
-          updateProduct={() => {}}
+          updateProduct={updateProduct}
           selectedProductsIDs={selectedProductsIDs}
         />
       )}
@@ -249,7 +228,7 @@ export default function ArticlesPage() {
         <Button
           variant="contained"
           onClick={() => handleDelete(selectedProductsIDs)}
-          disabled={selectedProductsIDs.length === 0}
+          // disabled={selectedProductsIDs.length === 0}
         >
           Delete
         </Button>
